@@ -32,6 +32,8 @@ export class Server {
     }
 
     public configureMiddleware() {
+        this._app.use(express.static('src/server/static'));
+
         this._app.use(bodyParser.json());
         this._app.use(bodyParser.urlencoded({ extended: true }));
 

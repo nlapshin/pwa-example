@@ -1,0 +1,16 @@
+{
+  "short_name": "Translate",
+  "name": "Translate",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#552277",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#009933"
+}
