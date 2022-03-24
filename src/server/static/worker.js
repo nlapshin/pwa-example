@@ -7,7 +7,7 @@ const files = [
 ];
 
 self.addEventListener('install', (event) => event.waitUntil(
-  caches.open('v1').then((cache) => cache.addAll(files))
+  caches.open('v1.1').then((cache) => cache.addAll(files))
 ));
 
 self.addEventListener('fetch', (event) => {
@@ -15,7 +15,7 @@ self.addEventListener('fetch', (event) => {
     if (response !== undefined) return response;
     return fetch(event.request).then((response) => {
       const responseClone = response.clone();
-      caches.open('v1').then((cache) => {
+      caches.open('v1.1').then((cache) => {
         cache.put(event.request, responseClone);
       });
       return response;
