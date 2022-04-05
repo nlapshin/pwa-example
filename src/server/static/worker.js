@@ -1,26 +1,49 @@
 'use strict';
 
-const files = [
-  '/',
-  '/translate.js',
-  '/manifest.json',
-];
+const addResourcesToCache = async (resources) => {
+  const cache = await caches.open('v1');
+  await cache.addAll(resources);
+};
 
-self.addEventListener('install', (event) => event.waitUntil(
-  caches.open('v1.1').then((cache) => cache.addAll(files))
-));
+const putInCache = async (request, response) => {
+  const cache = await caches.open('v1');
+  await cache.put(request, response);
+};
+
+const cacheFirst = async ({ request, preloadResponsePromise }) => {
+  const responseFromCache = await caches.match(request);
+  if (responseFromCache) {
+    return responseFromCache;
+  }
+
+  try {
+    const responseFromNetwork = await fetch(request);
+    putInCache(request, responseFromNetwork.clone());
+    return responseFromNetwork;
+  } catch (error) {
+    console.error(error);
+
+    return new Response('Network error happened', {
+      status: 408,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+};
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    addResourcesToCache([
+      '/',
+      '/translate.js',
+      '/manifest.json',
+    ])
+  );
+});
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(caches.match(event.request).then((response) => {
-    if (response !== undefined) return response;
-    return fetch(event.request).then((response) => {
-      const responseClone = response.clone();
-      caches.open('v1.1').then((cache) => {
-        cache.put(event.request, responseClone);
-      });
-      return response;
-    }).catch((error) => {
-      throw error;
-    });
-  }));
+  event.respondWith(
+    cacheFirst({
+      request: event.request
+    })
+  );
 });

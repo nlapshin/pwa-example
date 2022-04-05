@@ -1,50 +1,22 @@
 'use strict';
 
-console.log('JavaScript has loaded');
 
-const registerServiceWorker = () => {
-  if (!Reflect.has(navigator, 'serviceWorker')) {
-    console.log('Service workers are not supported');
-    return;
-  }
-  const { serviceWorker } = navigator;
-  serviceWorker.register('/worker.js').then((registration) => {
-    if (registration.installing) {
-      console.log('Service worker installing');
-      console.log(registration.installing);
-      return;
-    }
-    if (registration.waiting) {
-      console.log('Service worker installed');
-      console.log(registration.waiting);
-      return;
-    }
-    if (registration.active) {
-      console.log('Service worker active');
-      console.log(registration.active);
-      return;
-    }
-  }).catch((error) => {
-    console.log('Registration failed');
-    console.log(error);
-  });
-};
+window.addEventListener('load', async () => {
+  await registerServiceWorker();
 
-window.addEventListener('load', () => {
-  console.log('The page has loaded');
-  registerServiceWorker();
   registerApp();
 });
 
-window.addEventListener('beforeinstallprompt', (event) => {
-  console.log('Installing PWA');
-  console.dir({ beforeinstallprompt: event });
-});
+async function registerServiceWorker() {
+  if (!Reflect.has(navigator, 'serviceWorker')) {
+    return;
+  }
 
-window.addEventListener('appinstalled', (event) => {
-  console.log('PWA installed');
-  console.dir({ appinstalled: event });
-});
+  const { serviceWorker } = navigator;
+  
+  await serviceWorker.register('/worker.js');
+};
+
 
 function registerApp() {
   const api = {
@@ -62,7 +34,6 @@ function registerApp() {
       return json ? json.ru : ''
     }
   }
-
   
   const button = document.getElementById("button")
   const text = document.getElementById("text")
